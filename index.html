@@ -13,55 +13,55 @@
       scroll-behavior: smooth;
     }
 
+    /* 🔥 Loader */
+    #loader {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #ccc;
+      border-top: 5px solid #25D366;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
     header {
       text-align: center;
-      padding: 30px 10px;
-      animation: fadeDown 1s ease;
+      padding: 30px;
     }
 
-    header h1 {
-      font-size: 28px;
-      margin: 0;
-    }
-
-    .container {
-      background: white;
-      color: black;
-      margin: 20px;
-      padding: 20px;
+    .glass {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
       border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      animation: fadeUp 1.2s ease;
+      padding: 20px;
+      margin: 20px;
     }
 
-    input, select {
+    input, select, button {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
       border-radius: 8px;
-      border: 1px solid #ccc;
-      transition: 0.3s;
-    }
-
-    input:focus, select:focus {
-      border-color: #25D366;
-      transform: scale(1.02);
+      border: none;
     }
 
     button {
-      width: 100%;
-      padding: 12px;
       background: #25D366;
       color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background: #1ebe5d;
-      transform: scale(1.05);
     }
 
     .gallery {
@@ -72,7 +72,7 @@
     }
 
     .gallery img {
-      width: 120px;
+      width: 150px;
       border-radius: 10px;
       transition: 0.3s;
     }
@@ -81,32 +81,39 @@
       transform: scale(1.1);
     }
 
-    @keyframes fadeUp {
-      from {opacity:0; transform: translateY(40px);}
-      to {opacity:1; transform: translateY(0);}
+    .fade {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: 1s;
     }
 
-    @keyframes fadeDown {
-      from {opacity:0; transform: translateY(-40px);}
-      to {opacity:1; transform: translateY(0);}
+    .fade.show {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
 
 <body>
 
-<header>
+<!-- Loader -->
+<div id="loader">
+  <div class="spinner"></div>
+</div>
+
+<header class="fade">
   <h1>📸 Sevya Photo Studio</h1>
-  <p>Capturing Your Beautiful Moments</p>
+  <p>Premium Photography Experience</p>
 </header>
 
-<div class="gallery">
+<div class="gallery fade">
+  <!-- 👉 Ahiya tamara real photo mukje -->
   <img src="https://picsum.photos/200?1">
   <img src="https://picsum.photos/200?2">
   <img src="https://picsum.photos/200?3">
 </div>
 
-<div class="container">
+<div class="glass fade">
 
   <h3>📅 Book Your Shoot</h3>
 
@@ -145,13 +152,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// 🔥 Loader hide
+window.addEventListener("load", ()=>{
+  document.getElementById("loader").style.display = "none";
+});
+
+// 🔥 Scroll animation
+const fades = document.querySelectorAll(".fade");
+window.addEventListener("scroll", ()=>{
+  fades.forEach(el=>{
+    const top = el.getBoundingClientRect().top;
+    if(top < window.innerHeight - 50){
+      el.classList.add("show");
+    }
+  });
+});
+
 document.getElementById("form").addEventListener("submit", async (e)=>{
   e.preventDefault();
 
-  let name = document.getElementById("name").value;
-  let phone = document.getElementById("phone").value;
-  let service = document.getElementById("service").value;
-  let date = document.getElementById("date").value;
+  let name = name.value;
+  let phone = phone.value;
+  let service = service.value;
+  let date = date.value;
 
   const q = query(collection(db, "bookings"), where("date", "==", date));
   const snapshot = await getDocs(q);
